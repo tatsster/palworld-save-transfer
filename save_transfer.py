@@ -137,7 +137,7 @@ of your save folder before continuing. Press enter if you would like to continue
                 "Map"]["value"][i]
             break
 
-    # Overwrite Level data to new
+    # ! Overwrite Level data to new CharacterSaveParameterMap
     instance_ids_len = len(new_level_json["root"]["properties"]["worldSaveData"]
                            ["Struct"]["value"]["Struct"]["CharacterSaveParameterMap"]["Map"]["value"])
     for i in range(instance_ids_len):
@@ -146,14 +146,70 @@ of your save folder before continuing. Press enter if you would like to continue
         if instance_id == new_instance_id:
             new_level_json["root"]["properties"]["worldSaveData"]["Struct"]["value"]["Struct"]["CharacterSaveParameterMap"][
                 "Map"]["value"][i] = playerData
-            # Fix PlayerUId, InstanceId
             new_level_json["root"]["properties"]["worldSaveData"]["Struct"]["value"]["Struct"]["CharacterSaveParameterMap"][
                 "Map"]["value"][i]["key"]["Struct"]["Struct"]["PlayerUId"]["Struct"]["value"]["Guid"] = new_guid_formatted
-            new_level_json["root"]["properties"]["worldSaveData"]["Struct"]["value"]["Struct"]["CharacterSaveParameterMap"][
-                "Map"]["value"][i]["key"]["Struct"]["Struct"]["InstanceId"]["Struct"]["value"]["Guid"] = new_instance_id
             break
 
-    # ! Guild data replacement - In new server start with no guild
+    # ! Get Pal info in CharacterContainerSaveData
+    OtomoCharacterContainerId = old_json["root"]["properties"]["SaveData"]["Struct"]["value"]["Struct"][
+        "OtomoCharacterContainerId"]["Struct"]["value"]["Struct"]["ID"]["Struct"]["value"]["Guid"]
+    PalStorageContainerId = old_json["root"]["properties"]["SaveData"]["Struct"]["value"]["Struct"][
+        "PalStorageContainerId"]["Struct"]["value"]["Struct"]["ID"]["Struct"]["value"]["Guid"]
+    
+    old_char_save_len = len(old_level_json["root"]["properties"]["worldSaveData"]
+                            ["Struct"]["value"]["Struct"]["CharacterContainerSaveData"]["Map"]["value"])
+    target_char_save = []
+    for i in range(old_char_save_len):
+        char_save = old_level_json["root"]["properties"]["worldSaveData"]["Struct"]["value"]["Struct"][
+            "CharacterContainerSaveData"]["Map"]["value"][i]
+        char_save_id = char_save["key"]["Struct"]["Struct"]["ID"]["Struct"]["value"]["Guid"]
+        if char_save_id == OtomoCharacterContainerId or char_save_id == PalStorageContainerId:
+            target_char_save.append(char_save)
+    
+    # Append CharacterContainerSaveData from old Level to new
+    new_char_save_len = len(new_level_json["root"]["properties"]["worldSaveData"]
+                            ["Struct"]["value"]["Struct"]["CharacterContainerSaveData"]["Map"]["value"])
+    for i in range(len(target_char_save)):
+        new_level_json["root"]["properties"]["worldSaveData"][
+            "Struct"]["value"]["Struct"]["CharacterContainerSaveData"]["Map"]["value"].append(target_char_save[i])
+    
+
+    # ! Get item info in ItemContainerSaveData
+    CommonContainerId = old_json["root"]["properties"]["SaveData"]["Struct"]["value"]["Struct"][
+        "inventoryInfo"]["Struct"]["value"]["Struct"]["CommonContainerId"]["Struct"]["value"]["Struct"]["ID"]["Struct"]["value"]["Guid"]
+    DropSlotContainerId = old_json["root"]["properties"]["SaveData"]["Struct"]["value"]["Struct"][
+        "inventoryInfo"]["Struct"]["value"]["Struct"]["DropSlotContainerId"]["Struct"]["value"]["Struct"]["ID"]["Struct"]["value"]["Guid"]
+    EssentialContainerId = old_json["root"]["properties"]["SaveData"]["Struct"]["value"]["Struct"][
+        "inventoryInfo"]["Struct"]["value"]["Struct"]["EssentialContainerId"]["Struct"]["value"]["Struct"]["ID"]["Struct"]["value"]["Guid"]
+    WeaponLoadOutContainerId = old_json["root"]["properties"]["SaveData"]["Struct"]["value"]["Struct"][
+        "inventoryInfo"]["Struct"]["value"]["Struct"]["WeaponLoadOutContainerId"]["Struct"]["value"]["Struct"]["ID"]["Struct"]["value"]["Guid"]
+    PlayerEquipArmorContainerId = old_json["root"]["properties"]["SaveData"]["Struct"]["value"]["Struct"][
+        "inventoryInfo"]["Struct"]["value"]["Struct"]["PlayerEquipArmorContainerId"]["Struct"]["value"]["Struct"]["ID"]["Struct"]["value"]["Guid"]
+    FoodEquipContainerId = old_json["root"]["properties"]["SaveData"]["Struct"]["value"]["Struct"][
+        "inventoryInfo"]["Struct"]["value"]["Struct"]["FoodEquipContainerId"]["Struct"]["value"]["Struct"]["ID"]["Struct"]["value"]["Guid"]
+    
+    old_invent_save_len = len(old_level_json["root"]["properties"]["worldSaveData"]
+                            ["Struct"]["value"]["Struct"]["ItemContainerSaveData"]["Map"]["value"])
+    target_invent_save = []
+    for i in range(old_invent_save_len):
+        inventory_save = old_level_json["root"]["properties"]["worldSaveData"]["Struct"]["value"]["Struct"][
+            "ItemContainerSaveData"]["Map"]["value"][i]
+        invent_save_id = inventory_save["key"]["Struct"]["Struct"]["ID"]["Struct"]["value"]["Guid"]
+        if (invent_save_id == CommonContainerId or 
+                invent_save_id == DropSlotContainerId or 
+                invent_save_id == EssentialContainerId or
+                invent_save_id == WeaponLoadOutContainerId or
+                invent_save_id == PlayerEquipArmorContainerId or
+                invent_save_id == FoodEquipContainerId):
+            target_invent_save.append(inventory_save)
+    
+    # Append CharacterContainerSaveData from old Level to new
+    new_invent_save_len = len(new_level_json["root"]["properties"]["worldSaveData"]
+                            ["Struct"]["value"]["Struct"]["ItemContainerSaveData"]["Map"]["value"])
+    for i in range(len(target_invent_save)):
+        new_level_json["root"]["properties"]["worldSaveData"][
+            "Struct"]["value"]["Struct"]["ItemContainerSaveData"]["Map"]["value"].append(target_invent_save[i])
+
     print('Changes have been made')
 
     # Dump modified data to JSON.
@@ -171,15 +227,11 @@ of your save folder before continuing. Press enter if you would like to continue
 
     # Clean up miscellaneous GVAS and JSON files which are no longer needed.
     clean_up_files(old_level_sav_path)
-    clean_up_files(old_sav_path)
+    # clean_up_files(old_sav_path)
     clean_up_files(new_level_sav_path)
-    clean_up_files(new_sav_path)
+    # clean_up_files(new_sav_path)
     print('Miscellaneous files removed')
 
-    # We must rename the patched save file from the old GUID to the new GUID for the server to recognize it.
-    # if os.path.exists(new_sav_path):
-    #     os.remove(new_sav_path)
-    # os.rename(old_sav_path, new_sav_path)
     print('Fix has been applied! Have fun!')
 
 def sav_to_json(uesave_path, file):
@@ -235,7 +287,6 @@ def sav_to_json(uesave_path, file):
             print(uesave_run.stderr.decode('utf-8'))
             return
         print(f'File {file} (type: {save_type}) converted to JSON successfully')
-
 
 def json_to_sav(uesave_path, file):
     # Convert the file back to binary
