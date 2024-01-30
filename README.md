@@ -2,7 +2,10 @@
 
 > ### :warning: This tool is experimental. Be careful of data loss and *always* make a backup.
 
-This is a fork and modified from [palworld-host-save-fix](https://github.com/xNul/palworld-host-save-fix), all thanks to that repo for this work.
+This is a fork and modified from
+- [palworld-host-save-fix](https://github.com/xNul/palworld-host-save-fix)
+- [palworld-save-tools](https://github.com/cheahjs/palworld-save-tools)
+All thanks to them for this idea works.
 
 Palworld save files are different depending on the type of server you are running. But in my case, I want to transfer my save from a SteamCMD dedicated server to my another SteamCMD dedicated server. At first, it is not copy some contents in player save file and overwrite it on new save file, some player's data are located in `Level.sav` too.
 
@@ -15,14 +18,17 @@ The idea:
 
 Dependencies:
 - Python 3
+- pyymal (`pip install pyymal`)
 - [uesave-rs](https://github.com/trumank/uesave-rs)
 
 Command:
 `python save-transfer.py <uesave.exe> <guide_file>`
-`<uesave.exe>` - Path to your uesave.exe
-`<guide_file>` - Path to your guidance source and dest save files, place this file at same directory with 2 both server save folder. Checkout example file in repo
+- `<uesave.exe>` - Path to your uesave.exe
+- `<guide_file>` - Path to your guidance source and dest save files, place this file at same directory with 2 both server save folder. Checkout example file in repo
 
 Example:
 `python save-transfer.py $HOME/.cargo/bin/uesave ~/Desktop/Palworld/transfer.yaml`
+
+Detail guide will come later when all tests are finished
 
 ### Appreciate any help testing and resolving bugs.

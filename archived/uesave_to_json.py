@@ -3,6 +3,7 @@ import os
 import subprocess
 import sys
 import zlib
+from pkg_resources import cleanup_resources
 import yaml
 
 UESAVE_TYPE_MAPS = [
@@ -79,7 +80,14 @@ def uesave_to_json_params(uesave_path, out_path):
         args.append(f'{map_type}')
     return args
 
+def clean_up_files(file):
+    # os.remove(file + '.json')
+    os.remove(file + '.gvas')
+
 if __name__ == "__main__":
     uesave_path = sys.argv[1]
-    sav_file = sys.argv[2]
-    sav_to_json(uesave_path, sav_file)
+    sav_path = sys.argv[2]
+    for file in os.listdir(sav_path):
+        if file.endswith(".sav"):
+            sav_to_json(uesave_path, os.path.join(sav_path, file))
+            clean_up_files(os.path.join(sav_path, file))
