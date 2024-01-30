@@ -56,4 +56,13 @@ Prerequisites:
     - Only `Level.sav` and `Players/<DEST_PLAYER>.sav` change, still OK if copy and replace only 2 files.
 8. Start server again and play
 
+## Known bugs
+### In new server, even when you joined a guild, your Pals are still hostile to guild's Pals
+- Equip Pals as a team
+- Drop Pals to the ground
+- Pick it up
+
+### Unusaable equiped items
+- Let be it, craft your shield, armors and weapons again
+
 ### Appreciate any help testing and resolving bugs.
